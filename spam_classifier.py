@@ -1,9 +1,7 @@
 import pandas as pd
 
-# Load the dataset
 df = pd.read_csv('spam.csv', encoding='latin-1')
 
-# Keep only the useful columns
 df = df[['v1', 'v2']]
 df.columns = ['label', 'message']
 
@@ -14,31 +12,27 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score
 
-# Convert labels to numbers
 df['label'] = df['label'].map({'ham': 0, 'spam': 1})
 
-# Split data into training and testing
 X_train, X_test, y_train, y_test = train_test_split(
     df['message'], df['label'], test_size=0.2, random_state=42)
 
-# Convert text to numbers using TF-IDF
 vectorizer = TfidfVectorizer()
 X_train_tfidf = vectorizer.fit_transform(X_train)
 X_test_tfidf = vectorizer.transform(X_test)
 
-# Train the model
 model = MultinomialNB()
 model.fit(X_train_tfidf, y_train)
 
-# Test accuracy
 predictions = model.predict(X_test_tfidf)
 print(f"✅ Accuracy: {accuracy_score(y_test, predictions) * 100:.2f}%")
-# Test with your own messages!
+
 def predict_message(msg):
     msg_tfidf = vectorizer.transform([msg])
     result = model.predict(msg_tfidf)
     return "🚨 SPAM" if result[0] == 1 else "✅ HAM (Not Spam)"
 
-# Try these out!
-print(predict_message("FREE WINNER!! Claim your prize now! Call 09061743811 from landline!"))
-print(predict_message("Hey, are we still meeting tomorrow?"))
+print(predict_message("Congratulations! You've won $1000! Claim now!"))
+print(predict_message("FREE entry to win CASH PRIZE!! Text now!!"))
+print(predict_message("Hey, can you send me the notes from today's class?"))
+print(predict_message("Are you coming to the party tonight?"))
